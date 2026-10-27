@@ -2,3 +2,7 @@
     font-size: 4rem;
     text-align: center;
 }
+
+/*打ったら色変える*/
+.done { color: #2E3442; }
+.rest { color: #A9B5C3; }

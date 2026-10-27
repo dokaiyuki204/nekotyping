@@ -1,25 +1,32 @@
 document.addEventListener( "DOMContentLoaded", () => {
-  console.log("js読み込めてます");
   const keyElement = document.getElementById("key");
   const questionword = "neko";
   const wordElement = document.getElementById("question");
-  wordElement.textContent = questionword;
   let typingnum = 0;
+  const renderword = () => {
+    wordElement.innerHTML = `<span class="done">${questionword.slice(0,typingnum)}</span><span class="rest">${questionword.slice(typingnum)}</span>`;
+  }
+  renderword();
+  //定義もろもろ
 
-  document.addEventListener("keydown", (e) => {
+  document.addEventListener("keydown", (e) => { //キーボード押したときの処理
     if (typingnum >= questionword.length) {
-            wordElement.textContent = "You are Champion...";
             return;
-    } //先にクリア判定
+    }
 
     console.log(e.key);
     keyElement.textContent = e.key;
 
     if (questionword[typingnum] === e.key) {
-        console.log("NICE");
-        typingnum++;
+      console.log("NICE");
+      typingnum++;
+      renderword();
+
+      if (typingnum >= questionword.length) {
+         wordElement.textContent = "You are Champion...";
+      }
     } else {
-        console.log("REARY!?")
+      console.log("REARY!?")
     }
   });
 });
