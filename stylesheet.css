@@ -1,6 +1,11 @@
-#key {
-    font-size: 4rem;
+.play-space {
     text-align: center;
+}
+#question {
+    font-size: 4rem;
+}
+#key {
+    font-size: 2rem;
 }
 
 /*打ったら色変える*/
