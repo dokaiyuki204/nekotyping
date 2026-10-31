@@ -5,8 +5,9 @@ document.addEventListener( "DOMContentLoaded", () => {
   let typingnum = 0;
   let answerNum = 0;
   let missCount = 0;
+  let englishQuestion = "";
   const renderword = () => {
-    wordElement.innerHTML = `<span class="done">${questionword.slice(0,typingnum)}</span><span class="rest">${questionword.slice(typingnum)}</span>`;
+    document.getElementById("english").innerHTML = `<span class="done">${englishQuestion.slice(0,typingnum)}</span><span class="rest">${englishQuestion.slice(typingnum)}</span>`;
   }
   const timerResult = document.getElementById("timer");
   let watch;
@@ -16,10 +17,29 @@ document.addEventListener( "DOMContentLoaded", () => {
   const playtime = document.getElementById("time");
   //定義もろもろ
 
-  const words = [ "neko", "koneko", "oyaneko", "nekomimi", "shippo", "cat", "nya-nn" ];
+  const words = [ "ねこ", "こねこ", "おやねこ", "ねこみみ"//, "しっぽ", "きゃっと", "にゃーん" 
+    ];
+  const romajiTable = {
+    "お":["o"],
+    "こ":["ko"],
+    "ね":["ne"],
+    "み":["mi"],
+    "や":["ya"],
+  };
+  const toRomaji = (n) => {
+    //let sliceCoutner = 0;
+    let romajiText = "";
+    for (const char of n) {
+      romajiText += romajiTable[char][0];
+    }
+    return romajiText;
+  }
   const nextquestion = () => {
     questionword = words[Math.floor(Math.random()*words.length)];
     typingnum = 0;
+    englishQuestion = toRomaji(questionword);
+    document.getElementById("english").textContent = englishQuestion;
+    wordElement.textContent = questionword;
     renderword();
   }
   //問題集
@@ -52,12 +72,12 @@ document.addEventListener( "DOMContentLoaded", () => {
         return; //enter,shihtなどを無視
       }
 
-      if (questionword[typingnum] === e.key.toLowerCase()) { //大文字にも対応
+      if (englishQuestion[typingnum] === e.key.toLowerCase()) { //大文字にも対応
         //console.log("NICE");
         typingnum++;
         renderword();
 
-        if (typingnum >= questionword.length) {
+        if (typingnum >= englishQuestion.length) {
           answerNum++;
           if (answerNum >= 5) {
             clearInterval(watch);
