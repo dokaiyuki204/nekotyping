@@ -20,18 +20,24 @@ document.addEventListener( "DOMContentLoaded", () => {
   //定義もろもろ
 
   const words = [
-    "ねこ", "こねこ", "おやねこ", "ねこみみ", "しましま", "ふみふみ"//, "しっぽ", "きゃっと", "にゃーん" 
+    "ねこ", "こねこ", "おやねこ", "ねこみみ", "しましま", "ふみふみ", "にゃーん"//, "しっぽ", "きゃっと"
     ];
   const romajiTable = {
     "お":["o"],
     "こ":["ko","co"],
     "し":["si","shi"],
+    "に":["ni"],
+    "にゃ":["nya"],
     "ね":["ne"],
     "ふ":["hu","fu"],
     "ま":["ma"],
     "み":["mi"],
     "や":["ya"],
-  };
+    "ゃ":["lya","xya"],
+    "ー":["-"],
+    "ん":["nn"]
+  }; 
+
   const toRomaji = (n) => {
     //let sliceCoutner = 0;
     let romajiText = "";
@@ -41,10 +47,28 @@ document.addEventListener( "DOMContentLoaded", () => {
     return romajiText;
   }
 
+  const getCandidates = () => {
+    let candidate = romajiTable[questionword[kanaIndex]];
+    const pair = questionword.slice(kanaIndex, kanaIndex + 2);
+    if (romajiTable[pair]) {
+      candidate = candidate.concat(romajiTable[pair]);
+    }
+    return candidate;
+  };
   const renderword = () => {
-    document.getElementById("english").innerHTML = `<span class="done">${typedText}</span><span class="rest">${romajiTable[questionword[kanaIndex]].find((r) => r.startsWith(buffer)).slice(buffer.length) + toRomaji(questionword.slice(kanaIndex+1))}</span>`;
-    //document.getElementById("english").innerHTML = `<span class="done">${englishQuestion.slice(0,typingnum)}</span><span class="rest">${englishQuestion.slice(typingnum)}</span>`;
-  }
+    const current = getCandidates().find((r) => r.startsWith(buffer));
+    const pair = questionword.slice(kanaIndex, kanaIndex + 2);
+    let laterStart = kanaIndex + 1;
+    // current が pair の打ち方なら、laterStart を kanaIndex + 2 にする
+    if (romajiTable[pair] && romajiTable[pair].includes(current)) {
+      laterStart = kanaIndex + 2;      
+    }
+    const currentRest = current.slice(buffer.length);
+    const later = toRomaji(questionword.slice(laterStart));
+
+    document.getElementById("english").innerHTML =
+      `<span class="done">${typedText}</span><span class="rest">${currentRest}${later}</span>`;
+  };
 
   const nextquestion = () => {
     questionword = words[Math.floor(Math.random()*words.length)];
@@ -88,13 +112,18 @@ document.addEventListener( "DOMContentLoaded", () => {
       }
 
       next = buffer + e.key.toLowerCase();
-      if (romajiTable[questionword[kanaIndex]].filter((r) => r.startsWith(next)).length !== 0) {　//正誤判定
+      const candidate = getCandidates();
+      const pair = questionword.slice(kanaIndex, kanaIndex + 2);
+      if (candidate.filter((r) => r.startsWith(next)).length !== 0) {　//正誤判定
         //typingnum++;
         buffer += e.key.toLowerCase();
         typedText += e.key.toLowerCase();
-        renderword();
-        if (romajiTable[questionword[kanaIndex]].includes(buffer) === true) {
-          kanaIndex++;
+        if (candidate.includes(buffer)) {
+          if (romajiTable[pair] && romajiTable[pair].includes(buffer)) {
+            kanaIndex = kanaIndex + 2;
+          } else {
+            kanaIndex++;
+          }
           buffer = "";
           if (kanaIndex >= questionword.length) {
             answerNum++;
@@ -110,6 +139,7 @@ document.addEventListener( "DOMContentLoaded", () => {
             nextquestion();
           }
         }
+        renderword();
       } else {
         missCount++;
       }
